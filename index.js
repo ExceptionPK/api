@@ -304,37 +304,36 @@ app.post("/forgot-password", async (req, res) => {
                 Para restablecer tu contraseña, haz clic en el siguiente enlace:
                 [Enlace para restablecer contraseña]
         
-                Si el botón de arriba no funciona, copia y pega la siguiente URL en tu navegador web:
+                También puedes dirigirte a la página web oficial de T&A para consultar más información sobre la aplicación:
                 [URL de restablecimiento de contraseña]
         
                 Atentamente,
                 El equipo de soporte técnico
             `,
             html: `
-                <div style="font-family: Arial, sans-serif max-width: 600px margin: 0 auto">
-                    <p style="font-size: 16px line-height: 1.6">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <p style="font-size: 16px; line-height: 1.6;">
                         Estimado usuario,
                     </p>
-                    <p style="font-size: 16px line-height: 1.6">
+                    <p style="font-size: 16px; line-height: 1.6;">
                         Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta. 
                         Si no has solicitado este cambio, puedes ignorar este mensaje con tranquilidad.
                     </p>
-                    <p style="font-size: 16px line-height: 1.6">
+                    <p style="font-size: 16px; line-height: 1.6;">
                         Para restablecer tu contraseña, haz clic en el siguiente enlace:
-                        <a href="[Enlace para restablecer contraseña]" style="color: #406ef2">Restablecer contraseña</a>
+                        <a href="[Enlace para restablecer contraseña]" style="color: #406ef2;">Restablecer contraseña</a>
                     </p>
-                    <p style="font-size: 16px line-height: 1.6">
-                        Si el botón de arriba no funciona, copia y pega la siguiente URL en tu navegador web:
-                        [URL de restablecimiento de contraseña]
+                    <p style="font-size: 16px; line-height: 1.6;">
+                        También puedes dirigirte a la <a href="tasksandapp.webcindario.com" style="color: #406ef2;">página web oficial de T&A</a> para consultar más información sobre la aplicación.
                     </p>
-                    <p style="font-size: 16px line-height: 1.6">
+                    <p style="font-size: 16px; line-height: 1.6;">
                         Atentamente,<br>
                         El equipo de soporte técnico
                     </p>
                 </div>
             `
         }
-        
+
         // Enviar el correo electrónico utilizando el servicio de SendGrid
         await sgMail.send(msg)
 
