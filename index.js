@@ -7,7 +7,7 @@ require('dotenv').config()
 
 
 
-sgMail.setApiKey("API KEY") // Configuración de la API Key de SendGrid para enviar correos electrónicos
+sgMail.setApiKey(process.env.SENDGRID_API_KEY) // Configuración de la API Key de SendGrid para enviar correos electrónicos
 const app = express() // Creación de la aplicación Express
 const port = process.env.PORT // Definición del puerto en el que se ejecutará el servidor
 
@@ -293,7 +293,7 @@ app.post("/forgot-password", async (req, res) => {
         // Crear el mensaje de correo electrónico para la recuperación de contraseña
         const msg = {
             to: email,
-            from: { name: 'no-reply', email: 'saleunomas@gmail.com' },
+            from: { name: 'no-reply', email: 'chumakeriker@gmail.com' },
             subject: "Recuperación de contraseña",
             text: `
                 Estimado usuario,
