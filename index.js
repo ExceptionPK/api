@@ -279,6 +279,33 @@ app.delete("/todos/delete-all/:userId", async (req, res) => {
     }
 })
 
+// Genera una contraseña aleatoria
+function generateRandomPassword(length) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let password = ""
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length)
+        password += charset[randomIndex]
+    }
+    return password
+}
+
+// Función para actualizar la contraseña del usuario
+async function updatePassword(email, newPassword) {
+    try {
+        const user = await User.findOne({ email })
+        if (!user) {
+            throw new Error('Usuario no encontrado')
+        }
+        user.password = newPassword
+        await user.save()
+        return true
+    } catch (error) {
+        console.error('Error al actualizar la contraseña:', error)
+        return false
+    }
+}
+
 // Ruta para enviar un correo electrónico de recuperación de contraseña
 app.post("/forgot-password", async (req, res) => {
     try {
@@ -290,6 +317,15 @@ app.post("/forgot-password", async (req, res) => {
             return res.status(404).json({ title: "Error de datos", message: "El correo electrónico no está registrado." })
         }
 
+        // Generar una nueva contraseña aleatoria
+        const newPassword = generateRandomPassword(8)
+
+        // Actualizar la contraseña del usuario en la base de datos
+        const updated = await updatePassword(email, newPassword)
+        if (!updated) {
+            throw new Error('Error al actualizar la contraseña')
+        }
+
         // Crear el mensaje de correo electrónico para la recuperación de contraseña
         const msg = {
             to: email,
@@ -299,10 +335,8 @@ app.post("/forgot-password", async (req, res) => {
                 Estimado usuario,
         
                 Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta. 
-                Si no has solicitado este cambio, puedes ignorar este mensaje con tranquilidad.
         
-                Para restablecer tu contraseña, haz clic en el siguiente enlace:
-                [Enlace para restablecer contraseña]
+                Tu nueva contraseña es: ${newPassword}. Por favor, cambiala después de iniciar sesión.
         
                 También puedes dirigirte a la página web oficial de T&A para consultar más información sobre la aplicación:
                 [URL de restablecimiento de contraseña]
@@ -316,12 +350,10 @@ app.post("/forgot-password", async (req, res) => {
                         Estimado usuario,
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
-                        Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta. 
-                        Si no has solicitado este cambio, puedes ignorar este mensaje con tranquilidad.
+                        Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta.
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
-                        Para restablecer tu contraseña, haz clic en el siguiente enlace:
-                        <a href="[Enlace para restablecer contraseña]" style="color: #406ef2;">Restablecer contraseña</a>
+                    Tu nueva contraseña es: <strong>${newPassword}</strong>. Por favor, cámbiala después de iniciar sesión.
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
                         También puedes dirigirte a la <a href="tasksandapp.webcindario.com" style="color: #406ef2;">página web oficial de T&A</a> para consultar más información sobre la aplicación.
@@ -341,6 +373,52 @@ app.post("/forgot-password", async (req, res) => {
     } catch (error) {
         console.log("Error al enviar el correo electrónico de recuperación de contraseña:", error)
         res.status(500).json({ title: "Error de envío", message: "Hubo un error al enviar el correo electrónico de recuperación de contraseña." })
+    }
+})
+
+// Ruta para cambiar la contraseña
+app.put('/change-password', async (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body
+
+    try {
+        // Busca al usuario en la base de datos
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado.' })
+        }
+
+        // Verifica la contraseña actual sin cifrar
+        if (currentPassword !== user.password) {
+            return res.status(400).json({ message: 'La contraseña actual es incorrecta.' })
+        }
+
+        // Actualiza la contraseña del usuario en la base de datos sin cifrar
+        user.password = newPassword
+        await user.save()
+
+        res.status(200).json({ message: 'Contraseña actualizada exitosamente.' })
+    } catch (error) {
+        console.error('Error al cambiar la contraseña:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' })
+    }
+})
+
+app.post('/verify-password', async (req, res) => {
+    try {
+        const { userId, currentPassword } = req.body
+        // Buscar el usuario en la base de datos
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' })
+        }
+        // Comparar la contraseña actual proporcionada con la contraseña almacenada en la base de datos
+        if (user.password !== currentPassword) {
+            return res.json({ passwordMatch: false })
+        }
+        res.json({ passwordMatch: true })
+    } catch (error) {
+        console.error('Error al verificar la contraseña:', error)
+        res.status(500).json({ error: 'Error interno del servidor' })
     }
 })
 
