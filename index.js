@@ -333,16 +333,17 @@ app.post("/forgot-password", async (req, res) => {
             subject: "Recuperación de contraseña",
             text: `
                 Estimado usuario,
-        
+                
                 Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta. 
-        
-                Tu nueva contraseña es: ${newPassword}. Por favor, cambiala después de iniciar sesión.
-        
-                También puedes dirigirte a la página web oficial de T&A para consultar más información sobre la aplicación:
-                [URL de restablecimiento de contraseña]
-        
+                
+                Tu nueva contraseña es: ${newPassword}. Por favor, cámbiala después de iniciar sesión.
+                
+                También puedes dirigirte a la página web oficial de T&A para consultar más información sobre la aplicación.
+                
                 Atentamente,
                 El equipo de soporte técnico
+        
+                [Logo T&A]
             `,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -353,18 +354,29 @@ app.post("/forgot-password", async (req, res) => {
                         Hemos recibido una solicitud para restablecer la contraseña asociada a tu cuenta.
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
-                    Tu nueva contraseña es: <strong>${newPassword}</strong>. Por favor, cámbiala después de iniciar sesión.
+                        Tu nueva contraseña es: <strong>${newPassword}</strong>. Por favor, cámbiala después de iniciar sesión.
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
-                        También puedes dirigirte a la <a href="tasksandapp.webcindario.com" style="color: #406ef2;">página web oficial de T&A</a> para consultar más información sobre la aplicación.
+                        También puedes dirigirte a la <a href="http://tasksandapp.webcindario.com" style="color: #406ef2;">página web oficial de T&A</a> para consultar más información sobre la aplicación.
                     </p>
                     <p style="font-size: 16px; line-height: 1.6;">
                         Atentamente,<br>
                         El equipo de soporte técnico
                     </p>
+                    <a href="http://tasksandapp.webcindario.com" target="_blank"><img src="cid:footerCorreo" alt="Logo T&A"></a>
                 </div>
-            `
+            `,
+            attachments: [
+                {
+                    content: Buffer.from(require('fs').readFileSync('./footerCorreo.png')).toString('base64'),
+                    filename: 'footerCorreo.png',
+                    type: 'image/png',
+                    disposition: 'inline',
+                    content_id: 'footerCorreo'
+                }
+            ]
         }
+
 
         // Enviar el correo electrónico utilizando el servicio de SendGrid
         await sgMail.send(msg)
